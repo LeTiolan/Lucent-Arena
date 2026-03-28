@@ -126,13 +126,16 @@ function gameLoop(timestamp) {
 
     GameState.damageNumbers.forEach(dn => dn.draw(camera));
     
-    // UI Rendering layered above game
-    Renderer.renderMinimap(GameState.player, GameState.enemies);
+  // UI Rendering layered above game
+    if (GameState.player) {
+        Renderer.renderMinimap(GameState.player, GameState.enemies);
+    }
 
+    // This closing bracket finishes the gameLoop function!
     requestAnimationFrame(gameLoop);
-}
+} 
 
-// Boot up
+// Boot up the game when the window loads
 window.onload = () => {
     initGame();
 };
