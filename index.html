@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Project Lumina</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="bgCanvas"></canvas>
+        <canvas id="gameCanvas"></canvas>
+        <canvas id="fxCanvas"></canvas>
 
+        <div id="hud" class="ui-layer">
+            <div class="hud-top-bar">
+                <div class="stat-group">
+                    <div class="stat-label">HP</div>
+                    <div class="bar-container hp-container">
+                        <div id="hp-bar" class="bar hp-fill"></div>
+                        <span id="hp-text" class="bar-text">100 / 100</span>
+                    </div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-label">NRG</div>
+                    <div class="bar-container energy-container">
+                        <div id="energy-bar" class="bar energy-fill"></div>
+                        <span id="energy-text" class="bar-text">100 / 100</span>
+                    </div>
+                </div>
+                <div class="stat-group xp-group">
+                    <div class="stat-label">LVL <span id="level-text">1</span></div>
+                    <div class="bar-container xp-container">
+                        <div id="xp-bar" class="bar xp-fill"></div>
+                        <span id="xp-text" class="bar-text">0 / 1000</span>
+                    </div>
+                </div>
+                <div class="score-timer-group">
+                    <div class="score-display">SCORE: <span id="score-text">0</span></div>
+                    <div class="time-display">TIME: <span id="time-text">00:00</span></div>
+                </div>
+            </div>
+
+            <div id="minimap-container">
+                <canvas id="minimapCanvas"></canvas>
+            </div>
+
+            <div id="quest-tracker">
+                <h3>Objectives</h3>
+                <ul id="quest-list">
+                    </ul>
+            </div>
+
+            <div id="notification-area"></div>
+            <div id="dialogue-box" class="hidden">
+                <p id="dialogue-text"></p>
+                <span class="pulse-prompt">Press Space to continue...</span>
+            </div>
+
+            <div id="tooltip" class="hidden"></div>
+        </div>
+
+        <div id="menus-layer" class="ui-layer hidden">
+            
+            <div id="pause-menu" class="panel hidden">
+                <h2>PAUSED</h2>
+                <button id="btn-resume" class="menu-btn">Resume</button>
+                <button id="btn-skills" class="menu-btn">Skill Tree</button>
+                <button id="btn-inventory" class="menu-btn">Inventory</button>
+                <button id="btn-shop" class="menu-btn">Shop</button>
+                <button id="btn-settings" class="menu-btn">Settings</button>
+            </div>
+
+            <div id="inventory-panel" class="panel hidden">
+                <div class="panel-header">
+                    <h2>Inventory</h2>
+                    <button class="close-btn" data-target="inventory-panel">X</button>
+                </div>
+                <div id="inventory-grid" class="grid-30">
+                    </div>
+            </div>
+
+            <div id="skills-panel" class="panel hidden">
+                <div class="panel-header">
+                    <h2>Skill Tree</h2>
+                    <span class="skill-points">Points: <span id="sp-text">0</span></span>
+                    <button class="close-btn" data-target="skills-panel">X</button>
+                </div>
+                <div id="skills-container">
+                    </div>
+            </div>
+
+            <div id="shop-panel" class="panel hidden">
+                <div class="panel-header">
+                    <h2>Terminal Shop</h2>
+                    <button class="close-btn" data-target="shop-panel">X</button>
+                </div>
+                <div id="shop-items" class="shop-grid">
+                    </div>
+            </div>
+
+            <div id="settings-panel" class="panel hidden">
+                <div class="panel-header">
+                    <h2>Settings</h2>
+                    <button class="close-btn" data-target="settings-panel">X</button>
+                </div>
+                <div class="settings-group">
+                    <h3>Audio</h3>
+                    <label>Master Volume: <input type="range" id="vol-master" min="0" max="100" value="50"></label>
+                    <label>Music Volume: <input type="range" id="vol-music" min="0" max="100" value="50"></label>
+                    <label>SFX Volume: <input type="range" id="vol-sfx" min="0" max="100" value="50"></label>
+                </div>
+                <div class="settings-group">
+                    <h3>Graphics</h3>
+                    <label><input type="checkbox" id="toggle-bloom" checked> Soft Bloom Effects</label>
+                    <label><input type="checkbox" id="toggle-particles" checked> Particle Systems</label>
+                    <label><input type="checkbox" id="toggle-screenshake" checked> Screen Shake</label>
+                </div>
+            </div>
+
+            <div id="game-over-screen" class="panel hidden">
+                <h1 class="critical-text">SYSTEM FAILURE</h1>
+                <div class="final-stats">
+                    <p>Score: <span id="final-score">0</span></p>
+                    <p>Time Survived: <span id="final-time">00:00</span></p>
+                    <p>Enemies Eliminated: <span id="final-kills">0</span></p>
+                    <p>Level Reached: <span id="final-level">1</span></p>
+                </div>
+                <button id="btn-restart" class="menu-btn primary-btn">Reboot System</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
