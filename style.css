@@ -1,1 +1,406 @@
+:root {
+    --bg-color: #05050a;
+    --text-main: #e0e5ff;
+    --text-muted: #8088b3;
+    --accent-glow: rgba(120, 150, 255, 0.6);
+    --panel-bg: rgba(15, 18, 28, 0.65);
+    --panel-border: rgba(100, 120, 255, 0.15);
+    --hp-color: #ff4a6e;
+    --energy-color: #00e5ff;
+    --xp-color: #ffd700;
+    --slot-bg: rgba(30, 35, 50, 0.5);
+    --slot-hover: rgba(50, 60, 85, 0.8);
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, monospace;
+}
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body, html {
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Canvas Layers */
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#bgCanvas { z-index: 1; }
+#gameCanvas { z-index: 2; }
+#fxCanvas { 
+    z-index: 3; 
+    pointer-events: none; 
+    mix-blend-mode: screen; 
+}
+
+/* UI Layers */
+.ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass to canvas unless on an interactive element */
+}
+
+#hud { z-index: 10; }
+#menus-layer { 
+    z-index: 20; 
+    pointer-events: auto; 
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hidden Utility */
+.hidden { display: none !important; }
+
+/* HUD Top Bar */
+.hud-top-bar {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    padding: 15px 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-glow);
+    pointer-events: auto;
+}
+
+.stat-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-label {
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.bar-container {
+    width: 150px;
+    height: 18px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 9px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.bar {
+    height: 100%;
+    width: 100%;
+    border-radius: 9px;
+    transition: width 0.1s linear;
+}
+
+.hp-fill { background: var(--hp-color); box-shadow: 0 0 10px var(--hp-color); }
+.energy-fill { background: var(--energy-color); box-shadow: 0 0 10px var(--energy-color); }
+.xp-fill { background: var(--xp-color); box-shadow: 0 0 10px var(--xp-color); }
+
+.bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+    pointer-events: none;
+}
+
+.score-timer-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: monospace;
+    font-size: 14px;
+    color: var(--text-main);
+    text-align: right;
+}
+
+/* Minimap */
+#minimap-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 150px;
+    height: 150px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    padding: 5px;
+}
+
+#minimapCanvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+}
+
+/* Quests */
+#quest-tracker {
+    position: absolute;
+    top: 100px;
+    left: 20px;
+    background: var(--panel-bg);
+    border-left: 3px solid var(--energy-color);
+    padding: 15px;
+    border-radius: 0 8px 8px 0;
+    backdrop-filter: blur(5px);
+}
+
+#quest-tracker h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+#quest-list {
+    list-style: none;
+    font-size: 13px;
+}
+
+#quest-list li {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#quest-list li::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--energy-color);
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 5px var(--energy-color);
+}
+
+/* Panels (Menus, Inventory, Shop) */
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 30px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7), inset 0 0 20px rgba(255,255,255,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 400px;
+    max-height: 80vh;
+    animation: panelPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes panelPop {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 10px;
+}
+
+.panel-header h2 {
+    font-size: 24px;
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.close-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.1s;
+}
+
+.close-btn:hover {
+    color: var(--hp-color);
+    transform: scale(1.1);
+}
+
+/* Buttons */
+.menu-btn {
+    background: var(--slot-bg);
+    color: var(--text-main);
+    border: 1px solid var(--panel-border);
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.menu-btn:hover {
+    background: var(--slot-hover);
+    border-color: var(--energy-color);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.menu-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.primary-btn {
+    background: rgba(0, 229, 255, 0.2);
+    border-color: var(--energy-color);
+    font-weight: bold;
+}
+
+/* Inventory Grid */
+.grid-30 {
+    display: grid;
+    grid-template-columns: repeat(6, 50px);
+    grid-gap: 10px;
+    justify-content: center;
+}
+
+.inv-slot {
+    width: 50px;
+    height: 50px;
+    background: var(--slot-bg);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.inv-slot:hover {
+    background: var(--slot-hover);
+    border-color: var(--text-main);
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* Settings Group */
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settings-group h3 {
+    color: var(--energy-color);
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.settings-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+input[type="range"] {
+    accent-color: var(--energy-color);
+    cursor: pointer;
+}
+
+/* Game Over specific */
+.critical-text {
+    color: var(--hp-color);
+    text-align: center;
+    font-size: 32px;
+    text-shadow: 0 0 20px var(--hp-color);
+    letter-spacing: 2px;
+}
+
+.final-stats p {
+    font-size: 18px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed var(--panel-border);
+    padding-bottom: 5px;
+}
+
+/* Tooltip */
+#tooltip {
+    position: absolute;
+    background: rgba(10, 15, 20, 0.9);
+    border: 1px solid var(--energy-color);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    transition: opacity 0.1s;
+}
+
+/* Dialogue Box */
+#dialogue-box {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    padding: 20px 40px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    max-width: 600px;
+    text-align: center;
+}
+
+.pulse-prompt {
+    display: block;
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--energy-color);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
