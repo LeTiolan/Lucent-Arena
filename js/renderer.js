@@ -49,6 +49,35 @@ export const Renderer = {
             });
         }
     },
+    // Add these getter functions
+    getCamera: () => camera,
+    getWidth: () => width,
+    getHeight: () => height,
+
+    // Add the camera update logic
+    updateCamera: (player) => {
+        if (!player) return;
+        
+        // Center camera on player
+        let targetX = player.x - width / 2;
+        let targetY = player.y - height / 2;
+
+        // Smooth camera movement
+        camera.x += (targetX - camera.x) * 0.1;
+        camera.y += (targetY - camera.y) * 0.1;
+
+        // Add screen shake effect
+        if (shakeMagnitude > 0) {
+            camera.x += (Math.random() - 0.5) * shakeMagnitude;
+            camera.y += (Math.random() - 0.5) * shakeMagnitude;
+            shakeMagnitude *= 0.9;
+            if (shakeMagnitude < 0.1) shakeMagnitude = 0;
+        }
+    },
+
+    shake: (amount) => {
+        if (settings.screenshake) shakeMagnitude = amount;
+    },
 
     updateCamera: (player) => {
         camera.x = player.x - width / 2;
