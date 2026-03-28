@@ -4,6 +4,7 @@ import { AudioSystem } from './audio.js';
 import { Systems, GameState } from './systems.js';
 import { Player, Projectile } from './entities.js';
 import { UI } from './ui.js';
+import { Abilities } from './abilities.js'; // <-- ADDED THIS IMPORT
 
 let lastTime = 0;
 let mouse = { x: 0, y: 0, isDown: false };
@@ -91,6 +92,7 @@ function gameLoop(timestamp) {
 
     if (!GameState.isPaused && !GameState.isGameOver) {
         Systems.update();
+        Abilities.update(); // <-- ADDED THIS TO ACTIVATE ABILITIES
         Renderer.updateCamera(GameState.player);
         UI.updateHUD();
         
