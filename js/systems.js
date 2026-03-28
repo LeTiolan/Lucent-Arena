@@ -1,5 +1,6 @@
 // js/systems.js
 import { Enemy, Particle, DamageNumber } from './entities.js';
+import { Enemy, Particle, DamageNumber, Projectile } from './entities.js';
 import { AudioSystem } from './audio.js';
 import { Renderer, settings } from './renderer.js';
 
@@ -64,6 +65,10 @@ export const Systems = {
         for (let i = 0; i < count; i++) {
             GameState.particles.push(new Particle(x, y, color, 8, 30 + Math.random() * 20));
         }
+    },
+    
+    spawnPlayerProjectile: (x, y, vx, vy, damage) => {
+        GameState.projectiles.push(new Projectile(x, y, vx, vy, damage, true));
     },
 
     checkCollisions: () => {
